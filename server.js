@@ -1,49 +1,59 @@
 const express = require('express')
 const http = require('http')
 const { Server } = require('socket.io')
-const path = require('path')
 const manager = require('./main')
 
 const app = express()
 const server = http.createServer(app)
 const io = new Server(server)
 
-const PASSWORD = "shadow123"
-let status = "Kapalı"
+const PASSWORD = process.env.BOT_PASSWORD || "shadow123"
+const MAX_LOGS = 80  // panelde kaç log tutulsun
+
+let logs = []
+let botRunning = false
 
 app.use(express.json())
 app.use(express.static('public'))
 
-function setStatus(t){
-status=t
-io.emit('status',status)
+function addLog(msg) {
+  const line = `[${new Date().toLocaleTimeString('tr-TR')}] ${msg}`
+  logs.push(line)
+  if (logs.length > MAX_LOGS) logs.shift()
+  io.emit('log', line)
+  io.emit('status', botRunning ? 'online' : 'offline')
 }
 
-app.post('/start',(req,res)=>{
+app.post('/start', (req, res) => {
+  if (req.body.password !== PASSWORD)
+    return res.json({ ok: false, msg: 'Şifre yanlış' })
 
-if(req.body.password !== PASSWORD)
-return res.json({ok:false})
+  if (botRunning)
+    return res.json({ ok: false, msg: 'Bot zaten çalışıyor' })
 
-manager.startBot(req.body,setStatus)
-
-res.json({ok:true})
-
+  botRunning = true
+  manager.startBot(req.body, addLog)
+  res.json({ ok: true })
 })
 
-app.post('/stop',(req,res)=>{
+app.post('/stop', (req, res) => {
+  if (req.body.password !== PASSWORD)
+    return res.json({ ok: false, msg: 'Şifre yanlış' })
 
-if(req.body.password !== PASSWORD)
-return res.json({ok:false})
-
-manager.stopBot()
-setStatus("Durduruldu")
-
-res.json({ok:true})
-
+  botRunning = false
+  manager.stopBot(addLog)
+  res.json({ ok: true })
 })
 
-io.on('connection',(socket)=>{
-socket.emit('status',status)
+app.get('/logs', (req, res) => {
+  res.json(logs)
 })
 
-server.listen(process.env.PORT || 3000)
+io.on('connection', (socket) => {
+  socket.emit('status', botRunning ? 'online' : 'offline')
+  socket.emit('history', logs)
+})
+
+server.listen(process.env.PORT || 3000, () => {
+  console.log('Panel açık: http://localhost:3000')
+})
