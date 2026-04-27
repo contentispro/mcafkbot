@@ -2,7 +2,7 @@
   "name": "mcafkbot-pro",
   "version": "1.0.0",
   "description": "Minecraft 1.21.8 Anti-AFK Bot for Aternos and similar servers",
-  "main": "bot.js",
+  "main": "main.js",
   "scripts": {
     "start": "node main.js"
   },
