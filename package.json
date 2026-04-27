@@ -1,21 +1,13 @@
 {
-  "name": "mcafkbot-pro",
+  "name": "mcafkbot-pro-panel",
   "version": "1.0.0",
-  "description": "Minecraft 1.21.8 Anti-AFK Bot for Aternos and similar servers",
-  "main": "main.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "minecraft",
-    "mineflayer",
-    "afk-bot",
-    "aternos",
-    "anti-afk"
-  ],
-  "author": "Mehmet",
-  "license": "MIT",
   "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.8.1",
     "mineflayer": "^4.20.1"
   }
 }
