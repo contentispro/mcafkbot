@@ -1,0 +1,12 @@
+{
+  "name": "mcafkbot",
+  "version": "1.0.0",
+  "description": "Minecraft Anti-AFK Bot",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "mineflayer": "^4.23.0"
+  }
+}
